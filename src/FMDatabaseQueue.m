@@ -40,7 +40,7 @@
         FMDBRetain(_db);
         
         if (![_db open]) {
-            NSLog(@"Could not create database queue for path %@", aPath);
+            TMLog(@"Could not create database queue for path %@", aPath);
             FMDBRelease(self);
             return 0x00;
         }
@@ -59,7 +59,6 @@
     FMDBRelease(_path);
     
     if (_queue) {
-        FMDBDispatchQueueRelease(_queue);
         _queue = 0x00;
     }
 #if ! __has_feature(objc_arc)
@@ -82,7 +81,7 @@
         _db = FMDBReturnRetained([FMDatabase databaseWithPath:_path]);
         
         if (![_db open]) {
-            NSLog(@"FMDatabaseQueue could not reopen database for path %@", _path);
+            TMLog(@"FMDatabaseQueue could not reopen database for path %@", _path);
             FMDBRelease(_db);
             _db  = 0x00;
             return 0x00;
@@ -101,7 +100,7 @@
         block(db);
         
         if ([db hasOpenResultSets]) {
-            NSLog(@"Warning: there is at least one open result set around after performing [FMDatabaseQueue inDatabase:]");
+            TMLog(@"Warning: there is at least one open result set around after performing [FMDatabaseQueue inDatabase:]");
         }
     });
     

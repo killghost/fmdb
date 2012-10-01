@@ -79,7 +79,7 @@
     
     int err = sqlite3_open((_databasePath ? [_databasePath fileSystemRepresentation] : ":memory:"), &_db );
     if(err != SQLITE_OK) {
-        NSLog(@"error opening!: %d", err);
+        TMLog(@"error opening!: %d", err);
         return NO;
     }
     
@@ -90,7 +90,7 @@
 - (BOOL)openWithFlags:(int)flags {
     int err = sqlite3_open_v2((_databasePath ? [_databasePath fileSystemRepresentation] : ":memory:"), &_db, flags, NULL /* Name of VFS module to use */);
     if(err != SQLITE_OK) {
-        NSLog(@"error opening!: %d", err);
+        TMLog(@"error opening!: %d", err);
         return NO;
     }
     return YES;
@@ -122,8 +122,8 @@
             usleep(20);
             
             if (_busyRetryTimeout && (numberOfRetries++ > _busyRetryTimeout)) {
-                NSLog(@"%s:%d", __FUNCTION__, __LINE__);
-                NSLog(@"Database busy, unable to close");
+                TMLog(@"%s:%d", __FUNCTION__, __LINE__);
+                TMLog(@"Database busy, unable to close");
                 return NO;
             }
             
@@ -131,13 +131,13 @@
                 triedFinalizingOpenStatements = YES;
                 sqlite3_stmt *pStmt;
                 while ((pStmt = sqlite3_next_stmt(_db, 0x00)) !=0) {
-                    NSLog(@"Closing leaked statement");
+                    TMLog(@"Closing leaked statement");
                     sqlite3_finalize(pStmt);
                 }
             }
         }
         else if (SQLITE_OK != rc) {
-            NSLog(@"error closing!: %d", rc);
+            TMLog(@"error closing!: %d", rc);
         }
     }
     while (retry);
@@ -204,8 +204,8 @@
     int rc = sqlite3_rekey(_db, [key UTF8String], (int)strlen([key UTF8String]));
     
     if (rc != SQLITE_OK) {
-        NSLog(@"error on rekey: %d", rc);
-        NSLog(@"%@", [self lastErrorMessage]);
+        TMLog(@"error on rekey: %d", rc);
+        TMLog(@"%@", [self lastErrorMessage]);
     }
     
     return (rc == SQLITE_OK);
@@ -245,7 +245,7 @@
 }
 
 - (void)warnInUse {
-    NSLog(@"The FMDatabase %@ is currently in use.", self);
+    TMLog(@"The FMDatabase %@ is currently in use.", self);
     
 #ifndef NS_BLOCK_ASSERTIONS
     if (_crashOnErrors) {
@@ -259,7 +259,7 @@
     
     if (!_db) {
             
-        NSLog(@"The FMDatabase %@ is not open.", self);
+        TMLog(@"The FMDatabase %@ is not open.", self);
         
     #ifndef NS_BLOCK_ASSERTIONS
         if (_crashOnErrors) {
@@ -521,7 +521,7 @@
     FMResultSet *rs         = 0x00;
     
     if (_traceExecution && sql) {
-        NSLog(@"%@ executeQuery: %@", self, sql);
+        TMLog(@"%@ executeQuery: %@", self, sql);
     }
     
     if (_shouldCacheStatements) {
@@ -542,8 +542,8 @@
                 usleep(20);
                 
                 if (_busyRetryTimeout && (numberOfRetries++ > _busyRetryTimeout)) {
-                    NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
-                    NSLog(@"Database busy");
+                    TMLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
+                    TMLog(@"Database busy");
                     sqlite3_finalize(pStmt);
                     _isExecutingStatement = NO;
                     return nil;
@@ -552,9 +552,9 @@
             else if (SQLITE_OK != rc) {
                 
                 if (_logsErrors) {
-                    NSLog(@"DB Error: %d \"%@\"", [self lastErrorCode], [self lastErrorMessage]);
-                    NSLog(@"DB Query: %@", sql);
-                    NSLog(@"DB Path: %@", _databasePath);
+                    TMLog(@"DB Error: %d \"%@\"", [self lastErrorCode], [self lastErrorMessage]);
+                    TMLog(@"DB Query: %@", sql);
+                    TMLog(@"DB Path: %@", _databasePath);
 #ifndef NS_BLOCK_ASSERTIONS
                     if (_crashOnErrors) {
                         abort();
@@ -593,7 +593,7 @@
                 [self bindObject:[dictionaryArgs objectForKey:dictionaryKey] toColumn:namedIdx inStatement:pStmt];
             }
             else {
-                NSLog(@"Could not find index for %@", dictionaryKey);
+                TMLog(@"Could not find index for %@", dictionaryKey);
             }
         }
         
@@ -612,7 +612,7 @@
             }
             
             if (_traceExecution) {
-                NSLog(@"obj: %@", obj);
+                TMLog(@"obj: %@", obj);
             }
             
             idx++;
@@ -622,7 +622,7 @@
     }
     
     if (idx != queryCount) {
-        NSLog(@"Error: the bind count is not correct for the # of variables (executeQuery)");
+        TMLog(@"Error: the bind count is not correct for the # of variables (executeQuery)");
         sqlite3_finalize(pStmt);
         _isExecutingStatement = NO;
         return nil;
@@ -700,7 +700,7 @@
     FMStatement *cachedStmt  = 0x00;
     
     if (_traceExecution && sql) {
-        NSLog(@"%@ executeUpdate: %@", self, sql);
+        TMLog(@"%@ executeUpdate: %@", self, sql);
     }
     
     if (_shouldCacheStatements) {
@@ -721,8 +721,8 @@
                 usleep(20);
                 
                 if (_busyRetryTimeout && (numberOfRetries++ > _busyRetryTimeout)) {
-                    NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
-                    NSLog(@"Database busy");
+                    TMLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
+                    TMLog(@"Database busy");
                     sqlite3_finalize(pStmt);
                     _isExecutingStatement = NO;
                     return NO;
@@ -731,9 +731,9 @@
             else if (SQLITE_OK != rc) {
                 
                 if (_logsErrors) {
-                    NSLog(@"DB Error: %d \"%@\"", [self lastErrorCode], [self lastErrorMessage]);
-                    NSLog(@"DB Query: %@", sql);
-                    NSLog(@"DB Path: %@", _databasePath);
+                    TMLog(@"DB Error: %d \"%@\"", [self lastErrorCode], [self lastErrorMessage]);
+                    TMLog(@"DB Query: %@", sql);
+                    TMLog(@"DB Path: %@", _databasePath);
 #ifndef NS_BLOCK_ASSERTIONS
                     if (_crashOnErrors) {
                         abort();
@@ -777,7 +777,7 @@
                 [self bindObject:[dictionaryArgs objectForKey:dictionaryKey] toColumn:namedIdx inStatement:pStmt];
             }
             else {
-                NSLog(@"Could not find index for %@", dictionaryKey);
+                TMLog(@"Could not find index for %@", dictionaryKey);
             }
         }
         
@@ -796,7 +796,7 @@
             }
             
             if (_traceExecution) {
-                NSLog(@"obj: %@", obj);
+                TMLog(@"obj: %@", obj);
             }
             
             idx++;
@@ -807,7 +807,7 @@
     
     
     if (idx != queryCount) {
-        NSLog(@"Error: the bind count is not correct for the # of variables (%@) (executeUpdate)", sql);
+        TMLog(@"Error: the bind count is not correct for the # of variables (%@) (executeUpdate)", sql);
         sqlite3_finalize(pStmt);
         _isExecutingStatement = NO;
         return NO;
@@ -829,14 +829,14 @@
             if (SQLITE_LOCKED == rc) {
                 rc = sqlite3_reset(pStmt);
                 if (rc != SQLITE_LOCKED) {
-                    NSLog(@"Unexpected result from sqlite3_reset (%d) eu", rc);
+                    TMLog(@"Unexpected result from sqlite3_reset (%d) eu", rc);
                 }
             }
             usleep(20);
             
             if (_busyRetryTimeout && (numberOfRetries++ > _busyRetryTimeout)) {
-                NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
-                NSLog(@"Database busy");
+                TMLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [self databasePath]);
+                TMLog(@"Database busy");
                 retry = NO;
             }
         }
@@ -844,18 +844,18 @@
             // all is well, let's return.
         }
         else if (SQLITE_ERROR == rc) {
-            NSLog(@"Error calling sqlite3_step (%d: %s) SQLITE_ERROR", rc, sqlite3_errmsg(_db));
-            NSLog(@"DB Query: %@", sql);
+            TMLog(@"Error calling sqlite3_step (%d: %s) SQLITE_ERROR", rc, sqlite3_errmsg(_db));
+            TMLog(@"DB Query: %@", sql);
         }
         else if (SQLITE_MISUSE == rc) {
             // uh oh.
-            NSLog(@"Error calling sqlite3_step (%d: %s) SQLITE_MISUSE", rc, sqlite3_errmsg(_db));
-            NSLog(@"DB Query: %@", sql);
+            TMLog(@"Error calling sqlite3_step (%d: %s) SQLITE_MISUSE", rc, sqlite3_errmsg(_db));
+            TMLog(@"DB Query: %@", sql);
         }
         else {
             // wtf?
-            NSLog(@"Unknown error calling sqlite3_step (%d: %s) eu", rc, sqlite3_errmsg(_db));
-            NSLog(@"DB Query: %@", sql);
+            TMLog(@"Unknown error calling sqlite3_step (%d: %s) eu", rc, sqlite3_errmsg(_db));
+            TMLog(@"DB Query: %@", sql);
         }
         
     } while (retry);
@@ -888,8 +888,8 @@
     }
     
     if (closeErrorCode != SQLITE_OK) {
-        NSLog(@"Unknown error finalizing or resetting statement (%d: %s)", closeErrorCode, sqlite3_errmsg(_db));
-        NSLog(@"DB Query: %@", sql);
+        TMLog(@"Unknown error finalizing or resetting statement (%d: %s)", closeErrorCode, sqlite3_errmsg(_db));
+        TMLog(@"DB Query: %@", sql);
     }
     
     _isExecutingStatement = NO;
